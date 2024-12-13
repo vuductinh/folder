@@ -6,49 +6,33 @@
     <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/fontawesome.js" integrity="sha384-dPBGbj4Uoy1OOpM4+aRGfAOc0W37JkROT+3uynUgTHZCHZNMHfGXsmmvYTffZjYO" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
     <script src="/folder-management.js"></script>
+    <script src="/folder.css"></script>
     <title>Item List</title>
+    <style>
+        .children {
+            display: none;
+        }
+        .caret {
+            cursor: pointer;
+            user-select: none;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-left: 20px;
+        }
+    </style>
 </head>
 <body>
-<style type="text/css">
-
-</style>
 <div class="container-fluid">
     <div class="row" style="margin-top:10px;">
         <div class="col-md-3" style="height: 98vh; overflow:scroll;">
             <label><i class="fa fa-folder"></i> Folder</label>
-            <ul th:each="item : ${tree}">
-                <li>
-                    <span>
-                        <i class="fa fa-folder" aria-hidden="true"></i>
-                        <span th:text="${item.name}"></span>
-                    </span>
-                    <ul th:each="childrenFolder : ${item.children}">
-                        <li>
-                            <span>
-                                <i class="fa fa-folder" aria-hidden="true"></i>
-                                <span th:text="${childrenFolder.name}"></span>
-                            </span>
-                            <ul th:each="fileChildren : ${childrenFolder.files}">
-                                <li>
-                             <span>
-                                <i class="fa fa-file" aria-hidden="true"></i>
-                                <span th:text="${fileChildren.name}"></span>
-                            </span>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <ul th:each="file : ${item.files}">
-                        <li>
-                             <span>
-                                <i class="fa fa-file" aria-hidden="true"></i>
-                                <span th:text="${file.name}"></span>
-                            </span>
-                        </li>
-                    </ul>
-                </li>
+            <ul id="tree">
+                <li th:each="item : ${tree}" th:include="tree_node :: node(item=${item})"></li>
             </ul>
         </div>
         <div class="col-md-9">
@@ -63,22 +47,19 @@
 
                 </div>
                 <div class="col-md-12" style="margin-top: 10px;background-color: #b8c2cb !important; height: 50px; padding: 1%;">
-                    <label>Folder/Folder1</label>
+                    <label id="currentPath">Folder/Folder1</label>
                 </div>
-                <div class="col-md-12" style="margin-top: 10px;">
+                <div id="file-list" class="col-md-12" style="margin-top: 10px;">
                     <table class="w-100 table">
+                        <thead>
                         <tr>
                             <th>File name</th>
                             <th>Update on</th>
                             <th>Created date</th>
                             <th></th>
                         </tr>
-                        <tr>
-                            <td><i class="fa fa-folder" aria-hidden="true"></i> Folder1</td>
-                            <td>1/12/2024</td>
-                            <td>1/11/2024</td>
-                            <td><button class="btn-sm btn-danger">Change folder</button></td>
-                        </tr>
+                        </thead>
+                        <tbody id="file-display"></tbody>
                     </table>
                 </div>
                 <div class="col-md-12" style=" position: fixed;left: 0;bottom: 10px;width: 100%;color: white;text-align: center;">
@@ -93,5 +74,30 @@
         </div>
     </div>
 </div>
+<script>
+    function showFiles(folderId) {
+        fetch(`/get-files?folderId=${folderId}`)
+            .then(response => response.json())
+            .then(item => {
+                document.getElementById("currentPath").textContent = item.path;
+                const fileDisplay = document.getElementById("file-display");
+                fileDisplay.innerHTML = "";
+                item.files.forEach(file => {
+                    const row = document.createElement("tr");
+                    const updatedOn = file.updated ? new Date(file.updated).toLocaleDateString('en-GB') : "N/A";
+                    const createdDate = file.created ? new Date(file.created).toLocaleDateString('en-GB') : "N/A";
+                    row.innerHTML = `
+                    <td><i class="fa fa-folder" aria-hidden="true"></i> ${file.name}</td>
+                    <td>${updatedOn}</td>
+                    <td>${createdDate}</td>
+                    <td><button class="btn-sm btn-danger">Change folder</button></td>
+                `;
+
+                    fileDisplay.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
 </body>
 </html>

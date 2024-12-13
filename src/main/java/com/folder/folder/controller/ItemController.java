@@ -16,20 +16,20 @@ public class ItemController {
     public String listItems(Model model) {
         var lst = new ArrayList<Item>();
         var files = new ArrayList<Item>();
-        for(var i = 0; i < 10; i ++){
+        for(int i = 0; i < 10; i ++){
             var item1 = new Item();
+            item1.setId(i + 1);
+            item1.setName("Foler" + (i + 1));
+            files = new ArrayList<Item>();
             if(i%2 == 0){
-                item1.setId(i);
-                item1.setName("Foler" + i + 1);
-            }else {
-                for(var ii = 0; ii < 5; ii ++){
+                for(int ii = 0; ii < 5; ii ++){
                     var file = new Item();
-                    file.setId(ii);
-                    file.setName("File" + ii + 1);
+                    file.setId((ii + 1) * i + 1);
+                    file.setName("Folder" + (ii + 1));
                     files.add(file);
                 }
-                item1.setFiles(files);
             }
+            item1.setChildren(files);
             lst.add(item1);
         }
 
