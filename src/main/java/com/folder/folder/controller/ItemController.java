@@ -15,21 +15,24 @@ public class ItemController {
     @GetMapping("/items")
     public String listItems(Model model) {
         var lst = new ArrayList<Item>();
-        var item1 = new Item();
-        item1.setId(1);
-        item1.setName("Foler1");
+        var files = new ArrayList<Item>();
+        for(var i = 0; i < 10; i ++){
+            var item1 = new Item();
+            if(i%2 == 0){
+                item1.setId(i);
+                item1.setName("Foler" + i + 1);
+            }else {
+                for(var ii = 0; ii < 5; ii ++){
+                    var file = new Item();
+                    file.setId(ii);
+                    file.setName("File" + ii + 1);
+                    files.add(file);
+                }
+                item1.setFiles(files);
+            }
+            lst.add(item1);
+        }
 
-        var item2 = new Item();
-        item2.setId(2);
-        item2.setName("Foler2");
-
-        var item3 = new Item();
-        item3.setId(3);
-        item3.setName("Foler3");
-
-        lst.add(item1);
-        lst.add(item2);
-        lst.add(item3);
         model.addAttribute("tree", lst);
         return "items";
     }
