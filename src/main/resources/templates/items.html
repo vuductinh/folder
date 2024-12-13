@@ -76,7 +76,7 @@
 </div>
 <script>
     function showFiles(folderId) {
-        fetch(`/get-files?folderId=${folderId}`)
+        fetch(`/get-files/getFiles?folderId=${folderId}`)
             .then(response => response.json())
             .then(item => {
                 document.getElementById("currentPath").textContent = item.path;
@@ -87,7 +87,7 @@
                     const updatedOn = file.updated ? new Date(file.updated).toLocaleDateString('en-GB') : "N/A";
                     const createdDate = file.created ? new Date(file.created).toLocaleDateString('en-GB') : "N/A";
                     row.innerHTML = `
-                    <td><i class="fa fa-folder" aria-hidden="true"></i> ${file.name}</td>
+                    <td onclick="showFiles(${file.id})"><i class="fa fa-folder" aria-hidden="true"></i> ${file.name}</td>
                     <td>${updatedOn}</td>
                     <td>${createdDate}</td>
                     <td><button class="btn-sm btn-danger">Change folder</button></td>
